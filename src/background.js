@@ -49,6 +49,10 @@ async function removeGameTab(tabId) {
 
 async function gameTabClosed(tabId) {
   console.log(`Game tab "${tabId}" closed`);
+  const url = "https://itch.io/jam/godot-wild-jam-70/rate/2781818";
+  await browser.tabs.create({
+    url,
+  });
   await removeGameTab();
 }
 
@@ -60,25 +64,30 @@ async function gameTabClosed(tabId) {
     async (message, sender, sendResponse) => {
       console.log(`Message received: ${message}`);
       if (message.type === "toggleAddQueue") {
+        let response;
         if (queue.includes(message.item)) {
           console.log(`Removed "${message.item}" from the queue`);
           queue.splice(queue.indexOf(message.item));
-          sendResponse(false);
+          response = false;
         } else {
           console.log(`Add "${message.item}" to the queue`);
           queue.push(message.item);
-          sendResponse(true);
+          response = true;
         }
         setStorageItem("queue", queue);
+        return response;
       }
       if (message.type === "isInQueue") {
-        sendResponse(queue.includes(message.item));
+        return queue.includes(message.item);
       }
       if (message.type === "getQueue") {
-        sendResponse(queue);
+        return queue;
       }
       if (message.type === "launchGame") {
         await launchGame();
+      }
+      if (message.type === "nextGame") {
+        console.log("next game");
       }
     }
   );

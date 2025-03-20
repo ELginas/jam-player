@@ -71,13 +71,51 @@ async function scanAddElements() {
   }
 }
 
-const mainContainer = document.querySelector(".primary_column");
-const observer = new MutationObserver(async (mutationsList, observer) => {
+function setupObserver(query, observerCallback) {
+  const mainContainer = document.querySelector(query);
+  if (mainContainer === null) {
+    return;
+  }
+  const observer = new MutationObserver(observerCallback);
+  const config = { childList: true, subtree: true };
+  observer.observe(mainContainer, config);
+}
+
+const nextInQueueButton = {
+  canAdd() {
+    return document.querySelector(".visit_game") !== null;
+  },
+  hasAdded() {
+    return document.querySelector(".jamnextqueue") !== null;
+  },
+  add() {
+    const container = document.querySelector(".visit_game");
+    const spacer = document.createElement("div");
+    spacer.style.height = "12px";
+    container.appendChild(spacer);
+    const button = document.createElement("a");
+    button.innerHTML = `
+<a class="jamnextqueue button fat play_btn">Play next game in queue<svg class="svgicon icon_arrow_up_right" fill="none" role="img" viewBox="0 0 24 24" aria-hidden="" version="1.1" stroke-width="2" width="24" stroke-linecap="round" height="24" stroke-linejoin="round" stroke="currentColor"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></a>`;
+    button.onclick = async () => {
+      await browser.runtime.sendMessage({
+        type: "nextGame",
+      });
+    };
+    container.appendChild(button);
+  },
+  scan() {
+    if (this.canAdd() && !this.hasAdded()) {
+      this.add();
+    }
+  },
+};
+
+setupObserver(".primary_column", async () => {
   await scanAddElements();
 });
-const config = { childList: true, subtree: true };
-observer.observe(mainContainer, config);
+setupObserver(".main_column", () => nextInQueueButton.scan);
 
 (async () => {
   scanAddElements();
+  nextInQueueButton.scan();
 })();
