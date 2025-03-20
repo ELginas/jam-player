@@ -2,9 +2,20 @@ import { defineConfig } from "vite";
 import { svelte } from "@sveltejs/vite-plugin-svelte";
 import path from "path";
 
+const isDev = process.env.NODE_ENV !== "production";
+console.log(`isDev: ${isDev}`);
+
 export default defineConfig({
-  plugins: [svelte()],
+  plugins: [
+    svelte({
+      compilerOptions: {
+        dev: isDev,
+      },
+    }),
+  ],
   build: {
+    sourcemap: isDev ? "inline" : false,
+    minify: !isDev,
     rollupOptions: {
       input: {
         main: path.resolve(__dirname, "index.html"),
@@ -22,4 +33,5 @@ export default defineConfig({
       "@": path.resolve(__dirname, "src"),
     },
   },
+  logLevel: isDev ? "info" : "warn",
 });
