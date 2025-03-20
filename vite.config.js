@@ -1,5 +1,6 @@
 import { defineConfig } from "vite";
 import { svelte } from "@sveltejs/vite-plugin-svelte";
+import tailwindcss from "@tailwindcss/vite";
 import path from "path";
 
 const isDev = process.env.NODE_ENV !== "production";
@@ -12,6 +13,7 @@ export default defineConfig({
         dev: isDev,
       },
     }),
+    tailwindcss(),
   ],
   build: {
     sourcemap: isDev ? "inline" : false,
