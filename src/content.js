@@ -34,11 +34,9 @@ async function addButton(element) {
 
   // Must appear after creating elements because otherwise you can have multiple button creations in process
   let isInQueue = await browser.runtime.sendMessage({
-    type: "toggleAddQueue",
+    type: "isInQueue",
     item: gameId,
   });
-  //   let isInQueue = false;
-  console.log(isInQueue);
 
   newElement.classList.add("add_to_collection_btn");
   newElement.style.paddingLeft = "2px";
@@ -55,7 +53,6 @@ async function addButton(element) {
       type: "toggleAddQueue",
       item: gameId,
     });
-    console.log("sett");
     const url = queueTypeIcon(isInQueue);
     image.setAttribute("src", url);
   };
