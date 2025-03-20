@@ -18,5 +18,5 @@
       "js": ["content.js"]
     }
   ],
-  "permissions": ["https://itch.io/"]
+  "permissions": ["storage"]
 }
