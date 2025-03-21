@@ -21,8 +21,8 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: path.resolve(__dirname, "index.html"),
-        background: path.resolve(__dirname, "src/background.js"),
-        content: path.resolve(__dirname, "src/content.js"),
+        background: path.resolve(__dirname, "src/background.ts"),
+        content: path.resolve(__dirname, "src/content.ts"),
       },
       output: {
         entryFileNames: (chunk) => {

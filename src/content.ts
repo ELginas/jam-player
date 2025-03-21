@@ -1,19 +1,19 @@
 console.log("Jam player content script initialized");
 
-function hasButton(element) {
+function hasButton(element: Element) {
   return element.querySelector(".jambutton") !== null;
 }
 
-function canAddButton(element) {
+function canAddButton(element: Element) {
   return element.querySelector(".fading_data.cell_tools") !== null;
 }
 
-function gameIdFromHref(href) {
+function gameIdFromHref(href: string) {
   const arr = href.split("/");
   return arr[arr.length - 1];
 }
 
-function queueTypeIcon(isInQueue) {
+function queueTypeIcon(isInQueue: boolean) {
   if (isInQueue) {
     return browser.runtime.getURL("assets/RemoveFromQueue.svg");
   } else {
@@ -21,9 +21,9 @@ function queueTypeIcon(isInQueue) {
   }
 }
 
-async function addButton(element) {
+async function addButton(element: Element) {
   const container = element.querySelector(".fading_data.cell_tools");
-  const gameThumb = element.querySelector(".game_thumb");
+  const gameThumb = element.querySelector(".game_thumb") as HTMLAnchorElement;
   const gameId = gameIdFromHref(gameThumb.href);
   const newElement = document.createElement("div");
 
@@ -71,7 +71,7 @@ async function scanAddElements() {
   }
 }
 
-function setupObserver(query, observerCallback) {
+function setupObserver(query: string, observerCallback: MutationCallback) {
   const mainContainer = document.querySelector(query);
   if (mainContainer === null) {
     return;
