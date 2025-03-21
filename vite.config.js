@@ -23,6 +23,7 @@ export default defineConfig({
         main: path.resolve(__dirname, "index.html"),
         background: path.resolve(__dirname, "src/background.ts"),
         content: path.resolve(__dirname, "src/content.ts"),
+        hook: path.resolve(__dirname, "src/hook.js"),
       },
       output: {
         entryFileNames: (chunk) => {

@@ -1,4 +1,49 @@
-console.log("Jam player content script initialized");
+import { injectHook, isInQueue, toggleAddQueue } from "./api2";
+import type { DevToolsHook } from "react-devtools-inline";
+
+const reactState = {
+  root: null,
+  hook: null,
+  async setupHook() {
+    const result = await injectHook();
+
+    console.log(`Result: ${result}`);
+    // @ts-ignore
+    this.hook = window.wrappedJSObject
+      .__REACT_DEVTOOLS_GLOBAL_HOOK__ as DevToolsHook;
+    console.log("hookaaa", this.hook);
+  },
+  hasHook() {
+    return this.hook !== undefined && this.hook !== null;
+  },
+  hasRoot() {
+    return this.root !== undefined && this.root !== null;
+  },
+  setupRoot() {
+    const rendererId = [...this.hook.renderers.keys()][0];
+    const fiberRoots = this.hook.getFiberRoots(rendererId);
+    console.log(fiberRoots);
+    this.root = [...fiberRoots].filter(
+      (root) =>
+        root.containerInfo?.id ===
+        "view_jam_entries_186919_Jam-BrowseEntries_11301"
+    )[0];
+    console.log("root", this.root);
+  },
+  getEntries() {
+    const entries = this.root.current.child.memoizedState;
+    return entries;
+  },
+  async scan() {
+    console.log("scann");
+    if (!this.hasHook()) {
+      await this.setupHook();
+    }
+    if (this.hasHook() && !this.hasRoot()) {
+      this.setupRoot();
+    }
+  },
+};
 
 function hasButton(element: Element) {
   return element.querySelector(".jambutton") !== null;
@@ -33,15 +78,12 @@ async function addButton(element: Element) {
   container.appendChild(newElement);
 
   // Must appear after creating elements because otherwise you can have multiple button creations in process
-  let isInQueue = await browser.runtime.sendMessage({
-    type: "isInQueue",
-    item: gameId,
-  });
+  let _isInQueue = await isInQueue(gameId);
 
   newElement.classList.add("add_to_collection_btn");
   newElement.style.paddingLeft = "2px";
   newElement.style.paddingRight = "2px";
-  const url = queueTypeIcon(isInQueue);
+  const url = queueTypeIcon(_isInQueue);
   image.setAttribute("src", url);
   image.style.display = "block";
   image.style.position = "relative";
@@ -49,11 +91,8 @@ async function addButton(element: Element) {
   image.style.width = "24px";
   image.style.height = "24px";
   newElement.onclick = async () => {
-    isInQueue = await browser.runtime.sendMessage({
-      type: "toggleAddQueue",
-      item: gameId,
-    });
-    const url = queueTypeIcon(isInQueue);
+    _isInQueue = await toggleAddQueue(gameId);
+    const url = queueTypeIcon(_isInQueue);
     image.setAttribute("src", url);
   };
 }
@@ -112,10 +151,12 @@ const nextInQueueButton = {
 
 setupObserver(".primary_column", async () => {
   await scanAddElements();
+  await reactState.scan();
 });
 setupObserver(".main_column", () => nextInQueueButton.scan);
 
 (async () => {
   scanAddElements();
   nextInQueueButton.scan();
+  await reactState.scan();
 })();

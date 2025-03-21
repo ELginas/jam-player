@@ -1,5 +1,5 @@
 let queue: string[];
-let gameTabs: { tabId: number; url: string; }[];
+let gameTabs: { tabId: number; url: string }[];
 
 async function getStorageItem(key: string, _default: any) {
   const data = await browser.storage.local.get(key);
@@ -38,7 +38,9 @@ function hasGameTab(tabId: number) {
 }
 
 function getGameTabIndex(tabId: number) {
-  return gameTabs.findIndex((gameTab: { tabId: any; }) => gameTab.tabId === tabId);
+  return gameTabs.findIndex(
+    (gameTab: { tabId: any }) => gameTab.tabId === tabId
+  );
 }
 
 async function removeGameTab(tabId: number) {
@@ -56,41 +58,53 @@ async function gameTabClosed(tabId: number) {
   await removeGameTab(tabId);
 }
 
+async function injectHook(tabId: number) {
+  return await browser.scripting.executeScript({
+    files: ["hook.js"],
+    target: {
+      tabId,
+    },
+    // @ts-ignore
+    world: "MAIN",
+  });
+}
+
 (async () => {
   queue = await getStorageItem("queue", []);
   gameTabs = await getStorageItem("gameTabs", []);
 
-  browser.runtime.onMessage.addListener(
-    async (message) => {
-      console.log(`Message received: ${message}`);
-      if (message.type === "toggleAddQueue") {
-        let response: boolean;
-        if (queue.includes(message.item)) {
-          console.log(`Removed "${message.item}" from the queue`);
-          queue.splice(queue.indexOf(message.item));
-          response = false;
-        } else {
-          console.log(`Add "${message.item}" to the queue`);
-          queue.push(message.item);
-          response = true;
-        }
-        setStorageItem("queue", queue);
-        return response;
+  browser.runtime.onMessage.addListener(async (message, sender) => {
+    console.log(`Message received: ${message}`);
+    if (message.type === "toggleAddQueue") {
+      let response: boolean;
+      if (queue.includes(message.item)) {
+        console.log(`Removed "${message.item}" from the queue`);
+        queue.splice(queue.indexOf(message.item));
+        response = false;
+      } else {
+        console.log(`Add "${message.item}" to the queue`);
+        queue.push(message.item);
+        response = true;
       }
-      if (message.type === "isInQueue") {
-        return queue.includes(message.item);
-      }
-      if (message.type === "getQueue") {
-        return queue;
-      }
-      if (message.type === "launchGame") {
-        await launchGame();
-      }
-      if (message.type === "nextGame") {
-        console.log("next game");
-      }
+      setStorageItem("queue", queue);
+      return response;
     }
-  );
+    if (message.type === "isInQueue") {
+      return queue.includes(message.item);
+    }
+    if (message.type === "getQueue") {
+      return queue;
+    }
+    if (message.type === "launchGame") {
+      await launchGame();
+    }
+    if (message.type === "nextGame") {
+      console.log("next game");
+    }
+    if (message.type === "injectHook") {
+      return await injectHook(sender.tab.id);
+    }
+  });
 
   browser.tabs.onRemoved.addListener(async (tabId) => {
     if (hasGameTab(tabId)) {

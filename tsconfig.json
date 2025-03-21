@@ -6,7 +6,7 @@
     "./src/**/*.ts",
     "./src/**/*.svelte"
   ],
-  "exclude": ["./node_modules/**"],
+  //   "exclude": ["./node_modules/**"],
   "compilerOptions": {
     "paths": {
       "$lib": ["./src/lib"],
@@ -21,6 +21,7 @@
     "target": "esnext",
     "allowJs": true,
     "checkJs": true,
+    "strict": false,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
