@@ -7,8 +7,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "start": "web-ext run --source-dir dist",
-    "start:dev": "concurrently \"npm run dev\" \"web-ext run --source-dir dist\"",
-    "package": "npm run build && web-ext build --source-dir dist --overwrite-dest"
+    "start:dev": "concurrently \"pnpm run dev\" \"web-ext run --source-dir dist\"",
+    "package": "pnpm run build && web-ext build --source-dir dist --overwrite-dest"
   },
   "packageManager": "pnpm@10.6.4",
   "devDependencies": {
