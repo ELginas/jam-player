@@ -10,6 +10,12 @@ export async function canLaunchGame() {
   });
 }
 
+export async function nextGame() {
+  return await browser.runtime.sendMessage({
+    type: "nextGame",
+  });
+}
+
 export async function getQueue() {
   return await browser.runtime.sendMessage({
     type: "getQueue",

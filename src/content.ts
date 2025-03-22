@@ -1,4 +1,4 @@
-import { isInQueue, toggleAddQueue } from "./api2";
+import { canLaunchGame, isInQueue, nextGame, toggleAddQueue } from "./api2";
 
 function getJamEntry(gameId) {
   return window.wrappedJSObject.getJamEntry(gameId);
@@ -86,21 +86,27 @@ const nextInQueueButton = {
     return document.querySelector(".visit_game") !== null;
   },
   hasAdded() {
-    return document.querySelector(".jamnextqueue") !== null;
+    return document.querySelector(".jamspacer") !== null;
   },
-  add() {
+  async add() {
     const container = document.querySelector(".visit_game");
     const spacer = document.createElement("div");
+    spacer.classList.add("jamspacer");
     spacer.style.height = "12px";
     container.appendChild(spacer);
+
+    const hasNextGame = await canLaunchGame();
     const button = document.createElement("a");
     button.innerHTML = `
 <a class="jamnextqueue button fat play_btn">Play next game in queue<svg class="svgicon icon_arrow_up_right" fill="none" role="img" viewBox="0 0 24 24" aria-hidden="" version="1.1" stroke-width="2" width="24" stroke-linecap="round" height="24" stroke-linejoin="round" stroke="currentColor"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg></a>`;
-    button.onclick = async () => {
-      await browser.runtime.sendMessage({
-        type: "nextGame",
-      });
-    };
+    if (hasNextGame) {
+      button.onclick = async () => {
+        await nextGame();
+      };
+    } else {
+      button.style =
+        "--itchio_button_color:#C94935;--itchio_button_shadow_color:#C94935;--itchio_button_fg_color:#E9B6AE";
+    }
     container.appendChild(button);
   },
   scan() {

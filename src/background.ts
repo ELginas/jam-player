@@ -45,7 +45,7 @@ const gameTabs = {
     await this._sync();
   },
   async remove(tabId: number) {
-    this.data.splice(this.index(tabId));
+    this.data.splice(this.index(tabId), 1);
     this._sync();
   },
   index(tabId: number) {
@@ -99,7 +99,9 @@ const queue = {
     await this._sync();
   },
   async remove(gameId: number) {
-    this.data.splice(this.index(gameId));
+    console.log("before", this.data.length, this.index(gameId));
+    this.data.splice(this.index(gameId), 1);
+    console.log("after", this.data.length);
     await this._sync();
   },
   async toggle(gameId: number, data: object) {
@@ -155,6 +157,10 @@ const queue = {
     }
     if (message.type === "canLaunchGame") {
       return canLaunchGame();
+    }
+    if (message.type === "nextGame") {
+      await browser.tabs.remove(sender.tab.id);
+      await launchGame();
     }
   });
 
