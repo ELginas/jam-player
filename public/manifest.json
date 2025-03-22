@@ -3,7 +3,8 @@
   "name": "Jam Player",
   "version": "1.0.0",
   "icons": {
-    "48": "icons/border-48.png"
+    "64": "icons/icon-64.png",
+    "128": "icons/icon-128.png"
   },
   "background": {
     "scripts": ["background.js"],
