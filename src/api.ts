@@ -4,6 +4,12 @@ export async function launchGame() {
   });
 }
 
+export async function canLaunchGame() {
+  return await browser.runtime.sendMessage({
+    type: "canLaunchGame",
+  });
+}
+
 export async function getQueue() {
   return await browser.runtime.sendMessage({
     type: "getQueue",

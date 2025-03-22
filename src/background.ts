@@ -1,5 +1,3 @@
-let gameTabs: { tabId: number; url: string }[];
-
 async function getStorageItem(key: string, _default: any) {
   const data = await browser.storage.local.get(key);
   if (data === undefined || data[key] === undefined) {
@@ -19,46 +17,76 @@ async function setStorageItem(key: string, value: any) {
   });
 }
 
+async function canLaunchGame() {
+  return queue.front() !== undefined;
+}
+
 async function launchGame() {
-  const url = "https://mr-walkman.itch.io/run-piggy-run";
+  if (!canLaunchGame()) {
+    return;
+  }
+  const jamEntry = queue.front();
+  const url = jamEntry.data.game.url;
   const tab = await browser.tabs.create({
     url,
   });
-  await addGameTab(tab.id, url);
+  await gameTabs.add(tab.id, jamEntry.gameId, url);
 }
 
-async function addGameTab(tabId: number, url: string) {
-  console.log(`Game tab "${tabId}" added`);
-  gameTabs.push({
-    tabId,
-    url,
-  });
-  await setStorageItem("gameTabs", gameTabs);
-}
-
-function hasGameTab(tabId: number) {
-  return getGameTabIndex(tabId) !== -1;
-}
-
-function getGameTabIndex(tabId: number) {
-  return gameTabs.findIndex(
-    (gameTab: { tabId: any }) => gameTab.tabId === tabId
-  );
-}
-
-async function removeGameTab(tabId: number) {
-  const index = getGameTabIndex(tabId);
-  gameTabs.splice(index);
-  await setStorageItem("gameTabs", gameTabs);
-}
+const gameTabs = {
+  data: [],
+  async add(tabId: number, gameId: number, url: string) {
+    console.log(`Game tab "${tabId}" for "${gameId}" added`);
+    this.data.push({
+      tabId,
+      gameId,
+      url,
+    });
+    await this._sync();
+  },
+  async remove(tabId: number) {
+    this.data.splice(this.index(tabId));
+    this._sync();
+  },
+  index(tabId: number) {
+    return this.data.findIndex(
+      (gameTab: { tabId: any }) => gameTab.tabId === tabId
+    );
+  },
+  has(tabId: number) {
+    return this.index(tabId) !== -1;
+  },
+  get(tabId: number) {
+    const index = this.index(tabId);
+    if (index === -1) {
+      return;
+    }
+    return this.data[index];
+  },
+  async _sync() {
+    if (this.data.length !== 0) {
+      await setStorageItem("gameTabs", this.data);
+    } else {
+      await removeStorageItem("gameTabs");
+    }
+  },
+  async load_from_save() {
+    this.data = await getStorageItem("gameTabs", []);
+  },
+};
 
 async function gameTabClosed(tabId: number) {
   console.log(`Game tab "${tabId}" closed`);
-  const url = "https://itch.io/jam/godot-wild-jam-70/rate/2781818";
+  const gameTab = gameTabs.get(tabId);
+  const gameId = gameTab.gameId;
+  const jamEntry = queue.get(gameId);
+  const url = `https://itch.io${jamEntry.data.url}`;
+  console.log("gameTab", gameTab);
   await browser.tabs.create({
     url,
   });
-  await removeGameTab(tabId);
+  await gameTabs.remove(tabId);
+  await queue.remove(gameId);
 }
 
 const queue = {
@@ -92,6 +120,9 @@ const queue = {
   get(gameId: number) {
     return this.data[this.index(gameId)];
   },
+  front() {
+    return this.data[0];
+  },
   async _sync() {
     if (this.data.length !== 0) {
       await setStorageItem("queue", this.data);
@@ -106,7 +137,7 @@ const queue = {
 
 (async () => {
   await queue.load_from_save();
-  gameTabs = await getStorageItem("gameTabs", []);
+  await gameTabs.load_from_save();
 
   browser.runtime.onMessage.addListener(async (message, sender) => {
     console.log(`Message received: ${message}`);
@@ -122,24 +153,21 @@ const queue = {
     if (message.type === "launchGame") {
       await launchGame();
     }
-    if (message.type === "nextGame") {
-      console.log("next game");
+    if (message.type === "canLaunchGame") {
+      return canLaunchGame();
     }
   });
 
   browser.tabs.onRemoved.addListener(async (tabId) => {
-    if (hasGameTab(tabId)) {
+    if (gameTabs.has(tabId)) {
       await gameTabClosed(tabId);
     }
   });
 
   browser.tabs.onUpdated.addListener(
     async (tabId, changeInfo) => {
-      const gameTabIndex = getGameTabIndex(tabId);
-      if (
-        gameTabIndex !== -1 &&
-        gameTabs[gameTabIndex].url !== changeInfo.url
-      ) {
+      const gameTab = gameTabs.get(tabId);
+      if (gameTab !== undefined && gameTab.url !== changeInfo.url) {
         await gameTabClosed(tabId);
       }
     },
