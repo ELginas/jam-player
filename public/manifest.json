@@ -2,6 +2,12 @@
   "manifest_version": 3,
   "name": "Jam Player",
   "version": "0.1.0",
+  "developer": {
+    "name": "ELginas",
+    "url": "https://github.com/ELginas"
+  },
+  "homepage_url": "https://github.com/elginas/jam-player",
+  "description": "Playtest game jam games faster and easier.",
   "icons": {
     "64": "icons/icon-64.png",
     "128": "icons/icon-128.png"
