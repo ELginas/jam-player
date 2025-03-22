@@ -1,4 +1,3 @@
-let queue: string[];
 let gameTabs: { tabId: number; url: string }[];
 
 async function getStorageItem(key: string, _default: any) {
@@ -8,6 +7,10 @@ async function getStorageItem(key: string, _default: any) {
   }
   const entry = data[key];
   return JSON.parse(entry);
+}
+
+async function removeStorageItem(key: string) {
+  await browser.storage.local.remove(key);
 }
 
 async function setStorageItem(key: string, value: any) {
@@ -58,51 +61,69 @@ async function gameTabClosed(tabId: number) {
   await removeGameTab(tabId);
 }
 
-async function injectHook(tabId: number) {
-  return await browser.scripting.executeScript({
-    files: ["hook.js"],
-    target: {
-      tabId,
-    },
-    // @ts-ignore
-    world: "MAIN",
-  });
-}
+const queue = {
+  data: [],
+  async add(gameId: number, data: object) {
+    this.data.push({
+      gameId,
+      data,
+    });
+    await this._sync();
+  },
+  async remove(gameId: number) {
+    this.data.splice(this.index(gameId));
+    await this._sync();
+  },
+  async toggle(gameId: number, data: object) {
+    if (!this.has(gameId)) {
+      await this.add(gameId, data);
+      return true;
+    } else {
+      await this.remove(gameId);
+      return false;
+    }
+  },
+  index(gameId: number) {
+    return this.data.findIndex((jamEntry) => jamEntry.data.game.id === gameId);
+  },
+  has(gameId: number) {
+    return this.index(gameId) !== -1;
+  },
+  get(gameId: number) {
+    return this.data[this.index(gameId)];
+  },
+  async _sync() {
+    if (this.data.length !== 0) {
+      await setStorageItem("queue", this.data);
+    } else {
+      await removeStorageItem("queue");
+    }
+  },
+  async load_from_save() {
+    this.data = await getStorageItem("queue", []);
+  },
+};
 
 (async () => {
-  queue = await getStorageItem("queue", []);
+  await queue.load_from_save();
   gameTabs = await getStorageItem("gameTabs", []);
 
   browser.runtime.onMessage.addListener(async (message, sender) => {
     console.log(`Message received: ${message}`);
     if (message.type === "toggleAddQueue") {
-      let response: boolean;
-      if (queue.includes(message.item)) {
-        console.log(`Removed "${message.item}" from the queue`);
-        queue.splice(queue.indexOf(message.item));
-        response = false;
-      } else {
-        console.log(`Add "${message.item}" to the queue`);
-        queue.push(message.item);
-        response = true;
-      }
-      setStorageItem("queue", queue);
-      return response;
+      return await queue.toggle(message.gameId, message.data);
     }
     if (message.type === "isInQueue") {
-      return queue.includes(message.item);
+      return queue.has(message.gameId);
     }
     if (message.type === "getQueue") {
-      return queue;
+      return queue.data;
     }
     if (message.type === "launchGame") {
       await launchGame();
     }
     if (message.type === "nextGame") {
       console.log("next game");
-    }
-    if (message.type === "injectHook") {
-      return await injectHook(sender.tab.id);
     }
   });
 

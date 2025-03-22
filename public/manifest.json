@@ -24,11 +24,5 @@
       "js": ["content.js"]
     }
   ],
-  "permissions": ["storage", "tabs", "scripting"],
-  "web_accessible_resources": [
-    {
-      "resources": ["api.js"],
-      "matches": ["<all_urls>"]
-    }
-  ]
+  "permissions": ["storage", "tabs", "scripting"]
 }

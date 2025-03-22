@@ -1,47 +1,8 @@
-import { injectHook, isInQueue, toggleAddQueue } from "./api2";
-import type { DevToolsHook } from "react-devtools-inline";
+import { isInQueue, toggleAddQueue } from "./api2";
 
-const reactState = {
-  root: null,
-  hook: null,
-  async setupHook() {
-    // const result = await injectHook();
-
-    // console.log(`Result: ${result}`);
-    // @ts-ignore
-    this.hook = window.wrappedJSObject
-      .__REACT_DEVTOOLS_GLOBAL_HOOK__ as DevToolsHook;
-    console.log("hookaaa", this.hook);
-  },
-  hasHook() {
-    return this.hook !== undefined && this.hook !== null;
-  },
-  hasRoot() {
-    return this.root !== undefined && this.root !== null;
-  },
-  setupRoot() {
-    const rendererId = [...this.hook.renderers.keys()][0];
-    const fiberRoots = this.hook.getFiberRoots(rendererId);
-    console.log("fiberRoots", fiberRoots);
-    this.root = [...fiberRoots].filter((root) =>
-      root.containerInfo?.id.startsWith("view_jam_entries_")
-    )[0];
-    console.log("root", this.root);
-  },
-  getEntries() {
-    const entries = this.root.current.child.memoizedState;
-    return entries;
-  },
-  async scan() {
-    console.log("scann");
-    if (!this.hasHook()) {
-      await this.setupHook();
-    }
-    if (this.hasHook() && !this.hasRoot()) {
-      this.setupRoot();
-    }
-  },
-};
+function getJamEntry(gameId) {
+  return window.wrappedJSObject.getJamEntry(gameId);
+}
 
 function hasButton(element: Element) {
   return element.querySelector(".jambutton") !== null;
@@ -53,7 +14,7 @@ function canAddButton(element: Element) {
 
 function gameIdFromHref(href: string) {
   const arr = href.split("/");
-  return arr[arr.length - 1];
+  return Number(arr[arr.length - 1]);
 }
 
 function queueTypeIcon(isInQueue: boolean) {
@@ -89,7 +50,9 @@ async function addButton(element: Element) {
   image.style.width = "24px";
   image.style.height = "24px";
   newElement.onclick = async () => {
-    _isInQueue = await toggleAddQueue(gameId);
+    const entry = getJamEntry(gameId);
+    console.log("entry", entry);
+    _isInQueue = await toggleAddQueue(gameId, entry);
     const url = queueTypeIcon(_isInQueue);
     image.setAttribute("src", url);
   };
@@ -149,12 +112,10 @@ const nextInQueueButton = {
 
 setupObserver(".primary_column", async () => {
   await scanAddElements();
-  await reactState.scan();
 });
 setupObserver(".main_column", () => nextInQueueButton.scan);
 
 (async () => {
   scanAddElements();
   nextInQueueButton.scan();
-  await reactState.scan();
 })();

@@ -10,22 +10,17 @@ export async function getQueue() {
   });
 }
 
-export async function injectHook() {
-  return await browser.runtime.sendMessage({
-    type: "injectHook",
-  });
-}
-
-export async function isInQueue(gameId: string) {
+export async function isInQueue(gameId: number) {
   return await browser.runtime.sendMessage({
     type: "isInQueue",
-    item: gameId,
+    gameId,
   });
 }
 
-export async function toggleAddQueue(gameId: string) {
+export async function toggleAddQueue(gameId: number, data: object) {
   return await browser.runtime.sendMessage({
     type: "toggleAddQueue",
-    item: gameId,
+    gameId,
+    data,
   });
 }
