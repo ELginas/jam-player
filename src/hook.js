@@ -2,6 +2,8 @@ import { initialize } from "react-devtools-core";
 
 let hasRoot = false;
 
+console.log("Hook script");
+
 const interval = setInterval(tryInitialize, 200);
 function tryInitialize() {
   if (hasRoot) {

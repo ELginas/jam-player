@@ -15,6 +15,12 @@
   "content_scripts": [
     {
       "matches": ["https://itch.io/*"],
+      "js": ["hook.js"],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": ["https://itch.io/*"],
       "js": ["content.js"]
     }
   ],

@@ -5,9 +5,9 @@ const reactState = {
   root: null,
   hook: null,
   async setupHook() {
-    const result = await injectHook();
+    // const result = await injectHook();
 
-    console.log(`Result: ${result}`);
+    // console.log(`Result: ${result}`);
     // @ts-ignore
     this.hook = window.wrappedJSObject
       .__REACT_DEVTOOLS_GLOBAL_HOOK__ as DevToolsHook;
@@ -22,11 +22,9 @@ const reactState = {
   setupRoot() {
     const rendererId = [...this.hook.renderers.keys()][0];
     const fiberRoots = this.hook.getFiberRoots(rendererId);
-    console.log(fiberRoots);
-    this.root = [...fiberRoots].filter(
-      (root) =>
-        root.containerInfo?.id ===
-        "view_jam_entries_186919_Jam-BrowseEntries_11301"
+    console.log("fiberRoots", fiberRoots);
+    this.root = [...fiberRoots].filter((root) =>
+      root.containerInfo?.id.startsWith("view_jam_entries_")
     )[0];
     console.log("root", this.root);
   },
