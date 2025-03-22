@@ -17,7 +17,7 @@ async function setStorageItem(key: string, value: any) {
   });
 }
 
-async function canLaunchGame() {
+function canLaunchGame() {
   return queue.front() !== undefined;
 }
 

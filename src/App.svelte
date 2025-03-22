@@ -1,12 +1,27 @@
 <script>
-  import { getQueue, launchGame } from "./api";
+  import { canLaunchGame, getQueue, launchGame } from "./api";
   import "./App.css";
+  import "@fontsource-variable/inter";
 
   const queue = getQueue();
+  const hasAnyGame = canLaunchGame();
+
+  async function onLaunchGame() {
+    await launchGame();
+    window.close();
+  }
+
+  const allPromises = Promise.all([queue, hasAnyGame]);
 </script>
 
-{#await queue then queue}
-  <span>{JSON.stringify(queue)}</span>
-{/await}
-<div class="p-2 bg-orange-200">This is example</div>
-<button onclick={launchGame}>Launch game</button>
+<div class="p-2 bg-lightgray font-semibold">
+  {#await allPromises then [queue, hasAnyGame]}
+    {#if hasAnyGame}
+      <button onclick={onLaunchGame} class="bg-primary p-1 rounded-sm"
+        >Start queue ({queue.length} games)</button
+      >
+    {:else}
+      <span>No games in queue</span>
+    {/if}
+  {/await}
+</div>

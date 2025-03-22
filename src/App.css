@@ -1,1 +1,70 @@
 @import "tailwindcss" important;
+
+html,
+body,
+body>div {
+    height: 100%;
+}
+
+* {
+    font-family: "Inter Variable", sans-serif;
+    letter-spacing: 3%;
+}
+
+body {
+    background-color: var(--color-lightgray);
+}
+
+img {
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
+}
+
+button {
+    @apply cursor-pointer;
+}
+
+span,
+input,
+button,
+select,
+option {
+    color: var(--color-white);
+}
+
+select,
+option {
+    appearance: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+}
+
+.flex-down {
+    @apply flex flex-col;
+}
+
+.btn {
+    @apply bg-lightgray text-white font-extralight text-sm px-3 py-1 rounded-md;
+}
+
+@utility mcolor-* {
+    --color-mcolor: --value(--color- *);
+}
+
+@theme {
+    --color-primary: #FA6149;
+    --color-mcolor: #ff00000;
+    --color-lightgray: rgb(0, 0, 0);
+    --color-darkgray: #111111;
+    --color-disabled: #676767;
+    --color-lightwhite: #e1e1e1;
+    --color-yellow: #fec767;
+    --color-darkyellow: #d6a54f;
+    --color-green: #c0e590;
+    --color-red: #e5a290;
+    --drop-shadow-add: 8px 4px 4px rgba(0, 0, 0, 0.25);
+    --drop-shadow-3xl: 0 35px 35px rgba(0, 0, 0, 0.25);
+}
