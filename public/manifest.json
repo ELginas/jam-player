@@ -7,7 +7,7 @@
   "description": "Playtest game jam games faster and easier.",
   "browser_specific_settings": {
     "gecko": {
-      "id": "jam-player@elginas.github.com"
+      "id": "jam-player@elginas"
     }
   },
   "icons": {
