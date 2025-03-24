@@ -1,5 +1,7 @@
 # Introduction
 
+https://github.com/user-attachments/assets/12549cc0-555c-4e47-b564-97d1f8ef4e8d
+
 **Jam Player** is a Firefox extension which speeds up game jam playtesting. Add game jam games into a queue and play then in sequence without jumping through many links manually.
 
 Features:
