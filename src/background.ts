@@ -140,57 +140,57 @@ const queue = {
   },
 };
 
+browser.runtime.onMessage.addListener(async (message, sender) => {
+  console.log(`Message received: ${message}`);
+  if (message.type === "toggleAddQueue") {
+    return await queue.toggle(message.gameId, message.data);
+  }
+  if (message.type === "isInQueue") {
+    return queue.has(message.gameId);
+  }
+  if (message.type === "getQueue") {
+    return queue.data;
+  }
+  if (message.type === "launchGame") {
+    await launchGame();
+  }
+  if (message.type === "canLaunchGame") {
+    return canLaunchGame();
+  }
+  if (message.type === "nextGame") {
+    await browser.tabs.remove(sender.tab.id);
+    await launchGame();
+  }
+});
+
+browser.tabs.onRemoved.addListener(async (tabId) => {
+  if (gameTabs.has(tabId)) {
+    await gameTabClosed(tabId);
+  }
+});
+
+const onTabUpdated = async (tabId, changeInfo) => {
+  const gameTab = gameTabs.get(tabId);
+  if (
+    gameTab !== undefined &&
+    changeInfo.url &&
+    gameTab.url !== changeInfo.url
+  ) {
+    await gameTabClosed(tabId);
+  }
+};
+
+if (isFirefox()) {
+  browser.tabs.onUpdated.addListener(onTabUpdated, {
+    properties: ["url"],
+  });
+} else {
+  browser.tabs.onUpdated.addListener(onTabUpdated);
+}
+
+console.log("Jam player background script initialized");
+
 (async () => {
   await queue.load_from_save();
   await gameTabs.load_from_save();
-
-  browser.runtime.onMessage.addListener(async (message, sender) => {
-    console.log(`Message received: ${message}`);
-    if (message.type === "toggleAddQueue") {
-      return await queue.toggle(message.gameId, message.data);
-    }
-    if (message.type === "isInQueue") {
-      return queue.has(message.gameId);
-    }
-    if (message.type === "getQueue") {
-      return queue.data;
-    }
-    if (message.type === "launchGame") {
-      await launchGame();
-    }
-    if (message.type === "canLaunchGame") {
-      return canLaunchGame();
-    }
-    if (message.type === "nextGame") {
-      await browser.tabs.remove(sender.tab.id);
-      await launchGame();
-    }
-  });
-
-  browser.tabs.onRemoved.addListener(async (tabId) => {
-    if (gameTabs.has(tabId)) {
-      await gameTabClosed(tabId);
-    }
-  });
-
-  const onTabUpdated = async (tabId, changeInfo) => {
-    const gameTab = gameTabs.get(tabId);
-    if (
-      gameTab !== undefined &&
-      changeInfo.url &&
-      gameTab.url !== changeInfo.url
-    ) {
-      await gameTabClosed(tabId);
-    }
-  };
-
-  if (isFirefox()) {
-    browser.tabs.onUpdated.addListener(onTabUpdated, {
-      properties: ["url"],
-    });
-  } else {
-    browser.tabs.onUpdated.addListener(onTabUpdated);
-  }
-
-  console.log("Jam player background script initialized");
 })();
