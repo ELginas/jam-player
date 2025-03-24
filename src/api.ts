@@ -38,3 +38,33 @@ export async function toggleAddQueue(gameId: number, data: object) {
     data,
   });
 }
+
+function waitForWindowEvent(eventCallback) {
+  return new Promise((resolve) => {
+    const listener = function (event) {
+      const result = eventCallback(event);
+      if (result === undefined) {
+        return;
+      }
+
+      window.removeEventListener("message", listener);
+      resolve(result);
+    };
+
+    window.addEventListener("message", listener);
+  });
+}
+
+export async function requestJamEntry(gameId: number) {
+  window.postMessage({
+    type: "requestJamEntry",
+    gameId,
+  });
+  const result = await waitForWindowEvent((e) => {
+    const message = e.data;
+    if (message.type === "responseJamEntry") {
+      return message.result;
+    }
+  });
+  return result;
+}

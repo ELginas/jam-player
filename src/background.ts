@@ -1,4 +1,5 @@
 import browser from "webextension-polyfill";
+import { isFirefox } from "./utils";
 
 async function getStorageItem(key: string, _default: any) {
   const data = await browser.storage.local.get(key);
@@ -172,17 +173,19 @@ const queue = {
     }
   });
 
-  browser.tabs.onUpdated.addListener(
-    async (tabId, changeInfo) => {
-      const gameTab = gameTabs.get(tabId);
-      if (gameTab !== undefined && gameTab.url !== changeInfo.url) {
-        await gameTabClosed(tabId);
+  if (isFirefox()) {
+    browser.tabs.onUpdated.addListener(
+      async (tabId, changeInfo) => {
+        const gameTab = gameTabs.get(tabId);
+        if (gameTab !== undefined && gameTab.url !== changeInfo.url) {
+          await gameTabClosed(tabId);
+        }
+      },
+      {
+        properties: ["url"],
       }
-    },
-    {
-      properties: ["url"],
-    }
-  );
+    );
+  }
 
   console.log("Jam player background script initialized");
 })();

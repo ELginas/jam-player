@@ -1,4 +1,5 @@
 import { initialize } from "react-devtools-core";
+import { isFirefox } from "./utils";
 
 (() => {
   if (window.__REACT_DEVTOOLS_GLOBAL_HOOK__) {
@@ -51,6 +52,19 @@ import { initialize } from "react-devtools-core";
       (jamEntry) => jamEntry.game.id === gameId
     )[0];
   };
+
+  if (!isFirefox()) {
+    window.addEventListener("message", (e) => {
+      const message = e.data;
+      if (message.type === "requestJamEntry") {
+        const result = window.getJamEntry(message.gameId);
+        window.postMessage({
+          type: "responseJamEntry",
+          result,
+        });
+      }
+    });
+  }
 
   tryInitialize();
 })();

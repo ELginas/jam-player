@@ -1,8 +1,19 @@
-import { canLaunchGame, isInQueue, nextGame, toggleAddQueue } from "./api";
+import {
+  canLaunchGame,
+  isInQueue,
+  nextGame,
+  requestJamEntry,
+  toggleAddQueue,
+} from "./api";
 import browser from "webextension-polyfill";
+import { isFirefox } from "./utils";
 
-function getJamEntry(gameId) {
-  return window.wrappedJSObject.getJamEntry(gameId);
+async function getJamEntry(gameId) {
+  if (isFirefox()) {
+    return window.wrappedJSObject.getJamEntry(gameId);
+  } else {
+    return await requestJamEntry(gameId);
+  }
 }
 
 function hasButton(element: Element) {
@@ -51,7 +62,7 @@ async function addButton(element: Element) {
   image.style.width = "24px";
   image.style.height = "24px";
   newElement.onclick = async () => {
-    const entry = getJamEntry(gameId);
+    const entry = await getJamEntry(gameId);
     console.log("entry", entry);
     _isInQueue = await toggleAddQueue(gameId, entry);
     const url = queueTypeIcon(_isInQueue);
