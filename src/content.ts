@@ -1,4 +1,5 @@
 import { canLaunchGame, isInQueue, nextGame, toggleAddQueue } from "./api2";
+import browser from "webextension-polyfill";
 
 function getJamEntry(gameId) {
   return window.wrappedJSObject.getJamEntry(gameId);

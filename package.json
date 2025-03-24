@@ -3,11 +3,14 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "NODE_ENV=development vite build --watch",
+    "dev:js": "NODE_ENV=development vite build --watch",
+    "dev:content": "NODE_ENV=development vite build --config vite.config.content.js --watch",
+    "dev:background": "NODE_ENV=development vite build --config vite.config.background.js --watch",
+    "dev:hook": "NODE_ENV=development vite build --config vite.config.hook.js --watch",
     "build": "vite build",
     "preview": "vite preview",
     "start": "web-ext run --source-dir dist",
-    "start:dev": "concurrently \"pnpm run dev\" \"web-ext run --source-dir dist\"",
+    "start:dev": "concurrently \"pnpm run dev:*\" \"web-ext run --source-dir dist\"",
     "package": "pnpm run build && web-ext build --source-dir dist --overwrite-dest"
   },
   "packageManager": "pnpm@10.6.4",
@@ -22,6 +25,7 @@
     "svelte": "^5.23.2",
     "tailwindcss": "^4.0.14",
     "vite": "^6.2.2",
-    "web-ext": "^8.5.0"
+    "web-ext": "^8.5.0",
+    "webextension-polyfill": "^0.12.0"
   }
 }

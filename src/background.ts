@@ -1,3 +1,5 @@
+import browser from "webextension-polyfill";
+
 async function getStorageItem(key: string, _default: any) {
   const data = await browser.storage.local.get(key);
   if (data === undefined || data[key] === undefined) {

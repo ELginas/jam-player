@@ -2,9 +2,7 @@ import { defineConfig } from "vite";
 import { svelte } from "@sveltejs/vite-plugin-svelte";
 import tailwindcss from "@tailwindcss/vite";
 import path from "path";
-
-const isDev = process.env.NODE_ENV !== "production";
-console.log(`isDev: ${isDev}`);
+import { isDev } from "./scripts/build_utils";
 
 export default defineConfig({
   plugins: [
@@ -21,9 +19,6 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: path.resolve(__dirname, "index.html"),
-        background: path.resolve(__dirname, "src/background.ts"),
-        content: path.resolve(__dirname, "src/content.ts"),
-        hook: path.resolve(__dirname, "src/hook.js"),
       },
       output: {
         entryFileNames: (chunk) => {
@@ -31,6 +26,7 @@ export default defineConfig({
         },
       },
     },
+    emptyOutDir: false,
   },
   resolve: {
     alias: {

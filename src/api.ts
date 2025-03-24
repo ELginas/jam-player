@@ -1,3 +1,5 @@
+import browser from "webextension-polyfill";
+
 export async function launchGame() {
   return await browser.runtime.sendMessage({
     type: "launchGame",
