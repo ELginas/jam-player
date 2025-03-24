@@ -50,6 +50,7 @@ cd jam-player
 pnpm install
 pnpm package:firefox
 # Verify installation
+# Note: everywhere where jam_player-0.1.1.zip is replace version with current version
 ls -l /home/ubuntu/jam-player/web-ext-artifacts/jam_player-0.1.1.zip
 ```
 
