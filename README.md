@@ -11,6 +11,22 @@ Features:
 - Play next game in queue button in rating page
 - Saving queue between browser restarts and reboots
 
+# Installation
+
+## Firefox
+
+1. A bit out of date version from [addons.firefox.org](https://addons.mozilla.org/en-US/firefox/addon/jam-player/)
+2. Install [`jam-player-{version}-firefox.zip`](https://github.com/ELginas/jam-player/releases) to Firefox Developer Edition
+   1. Download [`jam-player-{version}-firefox.zip`](https://github.com/ELginas/jam-player/releases)
+   2. In Firefox open Hamburger (3 lines) button at top right corner > Add-ons and themes > Extensions > Cog/settings icon > Install Add-on From File... and select downloaded file.
+
+## Chrome
+
+1. Download [`jam-player-{version}-chrome.zip`](https://github.com/ELginas/jam-player/releases)
+2. In Chrome open 3 dots at top right corner > Extensions > Manage Extensions
+3. Click a switch at top right corner to enable Developer mode
+4. Drag and drop downloaded file to Extensions window
+
 # Building
 
 Development setup:
