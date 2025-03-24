@@ -7,11 +7,14 @@
     "dev:content": "NODE_ENV=development vite build --config vite.config.content.js --watch",
     "dev:background": "NODE_ENV=development vite build --config vite.config.background.js --watch",
     "dev:hook": "NODE_ENV=development vite build --config vite.config.hook.js --watch",
-    "build": "vite build",
-    "preview": "vite preview",
-    "start": "web-ext run --source-dir dist",
-    "start:dev": "concurrently \"pnpm run dev:*\" \"web-ext run --source-dir dist\"",
-    "package": "pnpm run build && web-ext build --source-dir dist --overwrite-dest"
+    "build:js": "vite build",
+    "build:content": "vite build --config vite.config.content.js",
+    "build:background": "vite build --config vite.config.background.js",
+    "build:hook": "vite build --config vite.config.hook.js",
+    "start:firefox": "PLATFORM=firefox concurrently \"pnpm run dev:*\" \"web-ext run --source-dir dist\"",
+    "start:chrome": "PLATFORM=chrome pnpm run /^dev:.*/",
+    "package:firefox": "PLATFORM=firefox pnpm run /^build:.*/ && web-ext build --source-dir dist --overwrite-dest",
+    "package:chrome": "PLATFORM=chrome pnpm run /^build:.*/ && web-ext build --source-dir dist --overwrite-dest"
   },
   "packageManager": "pnpm@10.6.4",
   "devDependencies": {

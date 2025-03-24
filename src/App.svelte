@@ -14,10 +14,10 @@
   const allPromises = Promise.all([queue, hasAnyGame]);
 </script>
 
-<div class="p-2 bg-lightgray font-semibold w-fit">
+<div class="p-2 bg-lightgray font-semibold whitespace-nowrap">
   {#await allPromises then [queue, hasAnyGame]}
     {#if hasAnyGame}
-      <button onclick={onLaunchGame} class="bg-primary p-1 rounded-sm whitespace-nowrap"
+      <button onclick={onLaunchGame} class="bg-primary p-1 rounded-sm"
         >Start queue ({queue.length} games)</button
       >
     {:else}

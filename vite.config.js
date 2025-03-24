@@ -2,7 +2,7 @@ import { defineConfig } from "vite";
 import { svelte } from "@sveltejs/vite-plugin-svelte";
 import tailwindcss from "@tailwindcss/vite";
 import path from "path";
-import { isDev } from "./scripts/build_utils";
+import { manifestPlugin, isDev } from "./scripts/build_utils";
 
 export default defineConfig({
   plugins: [
@@ -12,6 +12,7 @@ export default defineConfig({
       },
     }),
     tailwindcss(),
+    manifestPlugin(),
   ],
   build: {
     sourcemap: isDev ? "inline" : false,
