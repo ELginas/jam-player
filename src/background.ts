@@ -123,13 +123,21 @@ const queue = {
     await this._sync();
   },
   async remove(gameId: number) {
-    console.log("before", this.data.length, this.index(gameId));
     this.data.splice(this.index(gameId), 1);
-    console.log("after", this.data.length);
     gameSelectorTabs.notify({
       type: "queueItemRemoved",
       gameId,
     });
+    await this._sync();
+  },
+  async clear() {
+    this.data.forEach(({ gameId, data }) => {
+      gameSelectorTabs.notify({
+        type: "queueItemRemoved",
+        gameId,
+      });
+    });
+    this.data = [];
     await this._sync();
   },
   async toggle(gameId: number, data: object) {
@@ -188,6 +196,9 @@ browser.runtime.onMessage.addListener(async (message, sender) => {
   }
   if (message.type === "addGameSelectorTab") {
     gameSelectorTabs.add(sender.tab.id);
+  }
+  if (message.type === "clearQueue") {
+    await queue.clear();
   }
 });
 

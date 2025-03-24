@@ -1,5 +1,5 @@
 <script>
-  import { canLaunchGame, getQueue, launchGame } from "./api";
+  import { canLaunchGame, clearQueue, getQueue, launchGame } from "./api";
   import "./App.css";
   import "@fontsource-variable/inter";
 
@@ -11,6 +11,11 @@
     window.close();
   }
 
+  async function onClear() {
+    await clearQueue();
+    window.close();
+  }
+
   const allPromises = Promise.all([queue, hasAnyGame]);
 </script>
 
@@ -19,9 +24,14 @@
     <span>Loading...</span>
   {:then [queue, hasAnyGame]}
     {#if hasAnyGame}
-      <button onclick={onLaunchGame} class="bg-primary p-1 rounded-sm"
-        >Start queue ({queue.length} games)</button
-      >
+      <div class="flex gap-2">
+        <button onclick={onLaunchGame} class="bg-primary p-1 rounded-sm"
+          >Start queue ({queue.length} games)</button
+        >
+        <button onclick={onClear}>
+          <img src="/assets/mdi_garbage.svg" alt="Delete" />
+        </button>
+      </div>
     {:else}
       <span>No games in queue</span>
     {/if}

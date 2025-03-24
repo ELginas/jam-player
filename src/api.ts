@@ -74,3 +74,9 @@ export async function addGameSelectorTab() {
     type: "addGameSelectorTab",
   });
 }
+
+export async function clearQueue() {
+  return await browser.runtime.sendMessage({
+    type: "clearQueue",
+  });
+}
