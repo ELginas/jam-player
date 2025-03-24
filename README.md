@@ -15,7 +15,7 @@ Development setup:
 
 ```sh
 pnpm install
-pnpm start:dev
+pnpm start:firefox
 ```
 
 Packaging:
@@ -23,7 +23,7 @@ Packaging:
 ```sh
 
 pnpm install
-pnpm package
+pnpm package:firefox
 ```
 
 Environment setup inside Ubuntu Docker container:
@@ -48,9 +48,9 @@ source /home/ubuntu/.bashrc
 git clone https://github.com/ELginas/jam-player.git
 cd jam-player
 pnpm install
-pnpm package
+pnpm package:firefox
 # Verify installation
-ls -l /home/ubuntu/jam-player/web-ext-artifacts/jam_player-0.1.0.zip
+ls -l /home/ubuntu/jam-player/web-ext-artifacts/jam_player-0.1.1.zip
 ```
 
 ## Verification
@@ -59,7 +59,7 @@ Sadly .zip file can't be verified by SHA256 because every package run generates 
 
 ```sh
 sudo apt-get install unzip -y
-unzip /home/ubuntu/jam-player/web-ext-artifacts/jam_player-0.1.0.zip -d /tmp/jam-player
+unzip /home/ubuntu/jam-player/web-ext-artifacts/jam_player-0.1.1.zip -d /tmp/jam-player
 find /tmp/jam-player -type f -exec sha256sum {} \; > checksums.txt
 sort checksums.txt -o checksums.txt
 cat checksums.txt
