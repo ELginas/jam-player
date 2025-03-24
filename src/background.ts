@@ -92,6 +92,27 @@ async function gameTabClosed(tabId: number) {
   await queue.remove(gameId);
 }
 
+const gameSelectorTabs = {
+  data: [],
+  add(tabId: number) {
+    this.data.push(tabId);
+  },
+  remove(tabId: number) {
+    this.data.splice(this.index(tabId), 1);
+  },
+  notify(message) {
+    this.data.forEach((tabId) => {
+      browser.tabs.sendMessage(tabId, message);
+    });
+  },
+  index(tabId: number) {
+    return this.data.indexOf(tabId);
+  },
+  has(tabId: number) {
+    return this.index(tabId) !== -1;
+  },
+};
+
 const queue = {
   data: [],
   async add(gameId: number, data: object) {
@@ -105,6 +126,10 @@ const queue = {
     console.log("before", this.data.length, this.index(gameId));
     this.data.splice(this.index(gameId), 1);
     console.log("after", this.data.length);
+    gameSelectorTabs.notify({
+      type: "queueItemRemoved",
+      gameId,
+    });
     await this._sync();
   },
   async toggle(gameId: number, data: object) {
@@ -161,11 +186,20 @@ browser.runtime.onMessage.addListener(async (message, sender) => {
     await browser.tabs.remove(sender.tab.id);
     await launchGame();
   }
+  if (message.type === "addGameSelectorTab") {
+    gameSelectorTabs.add(sender.tab.id);
+  }
 });
 
 browser.tabs.onRemoved.addListener(async (tabId) => {
   if (gameTabs.has(tabId)) {
     await gameTabClosed(tabId);
+  }
+
+  // TODO: It can also close by navigating to different URL but for simplicity
+  // it is not implemented yet
+  if (gameSelectorTabs.has(tabId)) {
+    gameSelectorTabs.remove(tabId);
   }
 });
 

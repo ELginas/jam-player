@@ -1,4 +1,5 @@
 import {
+  addGameSelectorTab,
   canLaunchGame,
   isInQueue,
   nextGame,
@@ -37,6 +38,8 @@ function queueTypeIcon(isInQueue: boolean) {
   }
 }
 
+const images = {};
+
 async function addButton(element: Element) {
   const container = element.querySelector(".fading_data.cell_tools");
   const gameThumb = element.querySelector(".game_thumb") as HTMLAnchorElement;
@@ -61,6 +64,7 @@ async function addButton(element: Element) {
   image.style.opacity = "100%";
   image.style.width = "24px";
   image.style.height = "24px";
+  images[gameId] = image;
   newElement.onclick = async () => {
     const entry = await getJamEntry(gameId);
     console.log("entry", entry);
@@ -133,7 +137,17 @@ setupObserver(".primary_column", async () => {
 });
 setupObserver(".main_column", () => nextInQueueButton.scan);
 
-(async () => {
-  scanAddElements();
-  nextInQueueButton.scan();
-})();
+browser.runtime.onMessage.addListener(async (message, sender) => {
+  if (message.type === "queueItemRemoved") {
+    const gameId = message.gameId;
+    const image = images[gameId];
+    if (image) {
+      const url = queueTypeIcon(false);
+      image.setAttribute("src", url);
+    }
+  }
+});
+
+scanAddElements();
+nextInQueueButton.scan();
+addGameSelectorTab();

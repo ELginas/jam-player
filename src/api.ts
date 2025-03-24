@@ -68,3 +68,9 @@ export async function requestJamEntry(gameId: number) {
   });
   return result;
 }
+
+export async function addGameSelectorTab() {
+  return await browser.runtime.sendMessage({
+    type: "addGameSelectorTab",
+  });
+}
