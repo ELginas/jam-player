@@ -18,7 +18,8 @@ Features:
 1. A bit out of date version from [addons.firefox.org](https://addons.mozilla.org/en-US/firefox/addon/jam-player/)
 2. Install [`jam-player-{version}-firefox.zip`](https://github.com/ELginas/jam-player/releases) to Firefox Developer Edition
    1. Download [`jam-player-{version}-firefox.zip`](https://github.com/ELginas/jam-player/releases)
-   2. In Firefox open Hamburger (3 lines) button at top right corner > Add-ons and themes > Extensions > Cog/settings icon > Install Add-on From File... and select downloaded file.
+   2. Go to `about:config` and set `xpinstall.signatures.required` to false
+   3. In Firefox open Hamburger (3 lines) button at top right corner > Add-ons and themes > Extensions > Cog/settings icon > Install Add-on From File... and select downloaded file.
 
 ## Chrome
 
