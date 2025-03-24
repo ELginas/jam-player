@@ -15,11 +15,18 @@ Features:
 
 ## Firefox
 
-1. A bit out of date version from [addons.firefox.org](https://addons.mozilla.org/en-US/firefox/addon/jam-player/)
-2. Install [`jam-player-{version}-firefox.zip`](https://github.com/ELginas/jam-player/releases) to Firefox Developer Edition
+### Method 1
+
+1. Download a bit out of date version from [addons.firefox.org](https://addons.mozilla.org/en-US/firefox/addon/jam-player/)
+
+### Method 2
+
+1. Install [`jam-player-{version}-firefox.zip`](https://github.com/ELginas/jam-player/releases) to Firefox Developer Edition
    1. Download [`jam-player-{version}-firefox.zip`](https://github.com/ELginas/jam-player/releases)
    2. Go to `about:config` and set `xpinstall.signatures.required` to false
    3. In Firefox open Hamburger (3 lines) button at top right corner > Add-ons and themes > Extensions > Cog/settings icon > Install Add-on From File... and select downloaded file.
+
+https://github.com/user-attachments/assets/92939532-2349-4540-9877-0d6cb37edb35
 
 ## Chrome
 
@@ -27,6 +34,8 @@ Features:
 2. In Chrome open 3 dots at top right corner > Extensions > Manage Extensions
 3. Click a switch at top right corner to enable Developer mode
 4. Drag and drop downloaded file to Extensions window
+
+https://github.com/user-attachments/assets/e8937110-f9b6-4c2f-aa64-f9b426cab88b
 
 # Building
 
