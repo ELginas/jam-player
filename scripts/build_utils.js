@@ -9,7 +9,7 @@ function generateManifest() {
   const manifest = {
     manifest_version: 3,
     name: "Jam Player",
-    version: "0.1.0",
+    version: "0.1.1",
     author: "ELginas",
     homepage_url: "https://github.com/ELginas/jam-player",
     description: "Playtest game jam games faster and easier.",
