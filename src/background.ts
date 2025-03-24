@@ -173,18 +173,23 @@ const queue = {
     }
   });
 
+  const onTabUpdated = async (tabId, changeInfo) => {
+    const gameTab = gameTabs.get(tabId);
+    if (
+      gameTab !== undefined &&
+      changeInfo.url &&
+      gameTab.url !== changeInfo.url
+    ) {
+      await gameTabClosed(tabId);
+    }
+  };
+
   if (isFirefox()) {
-    browser.tabs.onUpdated.addListener(
-      async (tabId, changeInfo) => {
-        const gameTab = gameTabs.get(tabId);
-        if (gameTab !== undefined && gameTab.url !== changeInfo.url) {
-          await gameTabClosed(tabId);
-        }
-      },
-      {
-        properties: ["url"],
-      }
-    );
+    browser.tabs.onUpdated.addListener(onTabUpdated, {
+      properties: ["url"],
+    });
+  } else {
+    browser.tabs.onUpdated.addListener(onTabUpdated);
   }
 
   console.log("Jam player background script initialized");
