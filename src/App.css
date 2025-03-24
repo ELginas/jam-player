@@ -9,6 +9,8 @@ body>div {
 * {
     font-family: "Inter Variable", sans-serif;
     letter-spacing: 3%;
+    margin: 0;
+    padding: 0;
 }
 
 body {

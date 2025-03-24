@@ -24,11 +24,11 @@
     <span>Loading...</span>
   {:then [queue, hasAnyGame]}
     {#if hasAnyGame}
-      <div class="flex gap-2">
+      <div class="flex gap-2 items-center">
         <button onclick={onLaunchGame} class="bg-primary p-1 rounded-sm"
           >Start queue ({queue.length} games)</button
         >
-        <button onclick={onClear}>
+        <button onclick={onClear} class="w-6 h-6">
           <img src="/assets/mdi_garbage.svg" alt="Delete" />
         </button>
       </div>
