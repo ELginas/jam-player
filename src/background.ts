@@ -94,11 +94,16 @@ async function gameTabClosed(tabId: number) {
 
 const gameSelectorTabs = {
   data: [],
-  add(tabId: number) {
+  async add(tabId: number) {
+    if (this.has(tabId)) {
+      return;
+    }
     this.data.push(tabId);
+    await this._sync();
   },
-  remove(tabId: number) {
+  async remove(tabId: number) {
     this.data.splice(this.index(tabId), 1);
+    await this._sync();
   },
   notify(message) {
     this.data.forEach((tabId) => {
@@ -110,6 +115,16 @@ const gameSelectorTabs = {
   },
   has(tabId: number) {
     return this.index(tabId) !== -1;
+  },
+  async _sync() {
+    if (this.data.length !== 0) {
+      await setStorageItem("gameSelectorTabs", this.data);
+    } else {
+      await removeStorageItem("gameSelectorTabs");
+    }
+  },
+  async load_from_save() {
+    this.data = await getStorageItem("gameSelectorTabs", []);
   },
 };
 
@@ -173,7 +188,14 @@ const queue = {
   },
 };
 
+let promises = [
+  queue.load_from_save(),
+  gameTabs.load_from_save(),
+  gameSelectorTabs.load_from_save(),
+];
+
 browser.runtime.onMessage.addListener(async (message, sender) => {
+  await Promise.all(promises);
   console.log(`Message received: ${message}`);
   if (message.type === "toggleAddQueue") {
     return await queue.toggle(message.gameId, message.data);
@@ -195,7 +217,7 @@ browser.runtime.onMessage.addListener(async (message, sender) => {
     await launchGame();
   }
   if (message.type === "addGameSelectorTab") {
-    gameSelectorTabs.add(sender.tab.id);
+    await gameSelectorTabs.add(sender.tab.id);
   }
   if (message.type === "clearQueue") {
     await queue.clear();
@@ -203,6 +225,7 @@ browser.runtime.onMessage.addListener(async (message, sender) => {
 });
 
 browser.tabs.onRemoved.addListener(async (tabId) => {
+  await Promise.all(promises);
   if (gameTabs.has(tabId)) {
     await gameTabClosed(tabId);
   }
@@ -210,11 +233,12 @@ browser.tabs.onRemoved.addListener(async (tabId) => {
   // TODO: It can also close by navigating to different URL but for simplicity
   // it is not implemented yet
   if (gameSelectorTabs.has(tabId)) {
-    gameSelectorTabs.remove(tabId);
+    await gameSelectorTabs.remove(tabId);
   }
 });
 
 const onTabUpdated = async (tabId, changeInfo) => {
+  await Promise.all(promises);
   const gameTab = gameTabs.get(tabId);
   if (
     gameTab !== undefined &&
@@ -234,8 +258,3 @@ if (isFirefox()) {
 }
 
 console.log("Jam player background script initialized");
-
-(async () => {
-  await queue.load_from_save();
-  await gameTabs.load_from_save();
-})();
