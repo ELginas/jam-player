@@ -1,5 +1,5 @@
 import { initialize } from "react-devtools-core";
-import { isFirefox } from "./utils";
+import { isFirefox } from "$lib/utils";
 
 (() => {
   if (window.__REACT_DEVTOOLS_GLOBAL_HOOK__) {

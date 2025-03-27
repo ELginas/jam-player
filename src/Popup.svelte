@@ -1,5 +1,11 @@
 <script>
-  import { canLaunchGame, clearQueue, getQueue, launchGame } from "./api";
+  import {
+    canLaunchGame,
+    clearQueue,
+    getQueue,
+    launchGame,
+    openSettings,
+  } from "$lib/api";
   import "./App.css";
   import "@fontsource-variable/inter";
 
@@ -16,25 +22,33 @@
     window.close();
   }
 
+  async function onSettings() {
+    await openSettings();
+    window.close();
+  }
+
   const allPromises = Promise.all([queue, hasAnyGame]);
 </script>
 
-<div class="p-2 bg-lightgray font-semibold whitespace-nowrap">
+<div class="p-2 bg-lightgray font-semibold text-white whitespace-nowrap">
   {#await allPromises}
     <span>Loading...</span>
   {:then [queue, hasAnyGame]}
-    {#if hasAnyGame}
-      <div class="flex gap-2 items-center">
-        <button onclick={onLaunchGame} class="bg-primary p-1 rounded-sm"
+    <div class="flex gap-2 items-center">
+      {#if hasAnyGame}
+        <button onclick={onLaunchGame} class="btn"
           >Start queue ({queue.length} games)</button
         >
         <button onclick={onClear} class="w-6 h-6">
           <img src="/assets/mdi_garbage.svg" alt="Delete" />
         </button>
-      </div>
-    {:else}
-      <span>No games in queue</span>
-    {/if}
+      {:else}
+        <span>No games in queue</span>
+      {/if}
+      <button onclick={onSettings} class="w-6 h-6">
+        <img src="/assets/SettingsIcon.svg" alt="Settings" />
+      </button>
+    </div>
   {:catch e}
     <span>Error: {e}</span>
   {/await}

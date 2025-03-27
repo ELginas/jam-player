@@ -5,9 +5,9 @@ import {
   nextGame,
   requestJamEntry,
   toggleAddQueue,
-} from "./api";
+} from "$lib/api";
 import browser from "webextension-polyfill";
-import { isFirefox } from "./utils";
+import { isFirefox } from "$lib/utils";
 
 async function getJamEntry(gameId) {
   if (isFirefox()) {

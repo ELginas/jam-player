@@ -18,5 +18,10 @@ export default defineConfig({
     },
     emptyOutDir: false,
   },
+  resolve: {
+    alias: {
+      $lib: path.resolve("./src/lib"),
+    },
+  },
   logLevel: isDev ? "info" : "warn",
 });

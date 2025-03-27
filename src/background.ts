@@ -1,24 +1,13 @@
 import browser from "webextension-polyfill";
-import { isFirefox } from "./utils";
-
-async function getStorageItem(key: string, _default: any) {
-  const data = await browser.storage.local.get(key);
-  if (data === undefined || data[key] === undefined) {
-    return _default;
-  }
-  const entry = data[key];
-  return JSON.parse(entry);
-}
-
-async function removeStorageItem(key: string) {
-  await browser.storage.local.remove(key);
-}
-
-async function setStorageItem(key: string, value: any) {
-  await browser.storage.local.set({
-    [key]: JSON.stringify(value),
-  });
-}
+import { isFirefox } from "$lib/utils";
+import {
+  getLocalStorageItem,
+  removeLocalStorageItem,
+  removeSessionStorageItem,
+  setLocalStorageItem,
+  setSessionStorageItem,
+} from "$lib/storage";
+import { openContainerTab } from "$lib/container";
 
 function canLaunchGame() {
   return queue.front() !== undefined;
@@ -68,29 +57,32 @@ const gameTabs = {
   },
   async _sync() {
     if (this.data.length !== 0) {
-      await setStorageItem("gameTabs", this.data);
+      await setLocalStorageItem("gameTabs", this.data);
     } else {
-      await removeStorageItem("gameTabs");
+      await removeLocalStorageItem("gameTabs");
     }
   },
   async load_from_save() {
-    this.data = await getStorageItem("gameTabs", []);
+    this.data = await getLocalStorageItem("gameTabs", []);
   },
 };
 
-async function gameTabClosed(tabId: number) {
-  console.log(`Game tab "${tabId}" closed`);
-  const gameTab = gameTabs.get(tabId);
-  const gameId = gameTab.gameId;
-  const jamEntry = queue.get(gameId);
-  const url = `https://itch.io${jamEntry.data.url}`;
-  console.log("gameTab", gameTab);
-  await browser.tabs.create({
-    url,
-  });
-  await gameTabs.remove(tabId);
-  await queue.remove(gameId);
-}
+const notification = {
+  promise: null,
+  resolve: null,
+  async open(message) {
+    await setSessionStorageItem("notification", message);
+    await browser.tabs.create({ url: "notification.html" });
+    this.promise = new Promise((resolve) => {
+      this.resolve = resolve;
+    });
+    return this.promise;
+  },
+  async _resolve(result) {
+    this.resolve(result);
+    await removeSessionStorageItem("notification");
+  },
+};
 
 const gameSelectorTabs = {
   data: [],
@@ -118,13 +110,13 @@ const gameSelectorTabs = {
   },
   async _sync() {
     if (this.data.length !== 0) {
-      await setStorageItem("gameSelectorTabs", this.data);
+      await setLocalStorageItem("gameSelectorTabs", this.data);
     } else {
-      await removeStorageItem("gameSelectorTabs");
+      await removeLocalStorageItem("gameSelectorTabs");
     }
   },
   async load_from_save() {
-    this.data = await getStorageItem("gameSelectorTabs", []);
+    this.data = await getLocalStorageItem("gameSelectorTabs", []);
   },
 };
 
@@ -178,13 +170,37 @@ const queue = {
   },
   async _sync() {
     if (this.data.length !== 0) {
-      await setStorageItem("queue", this.data);
+      await setLocalStorageItem("queue", this.data);
     } else {
-      await removeStorageItem("queue");
+      await removeLocalStorageItem("queue");
     }
   },
   async load_from_save() {
-    this.data = await getStorageItem("queue", []);
+    this.data = await getLocalStorageItem("queue", []);
+  },
+};
+
+const settings = {
+  data: {},
+  get(key: string) {
+    return this.data[key];
+  },
+  getAll() {
+    return this.data;
+  },
+  async set(key: string, value) {
+    this.data[key] = value;
+    this._sync();
+  },
+  async _sync() {
+    if (Object.entries(this.data).length !== 0) {
+      await setLocalStorageItem("settings", this.data);
+    } else {
+      await removeLocalStorageItem("settings");
+    }
+  },
+  async load_from_save() {
+    this.data = await getLocalStorageItem("settings", {});
   },
 };
 
@@ -192,7 +208,30 @@ let promises = [
   queue.load_from_save(),
   gameTabs.load_from_save(),
   gameSelectorTabs.load_from_save(),
+  settings.load_from_save(),
 ];
+
+// TODO: modularize this function and make containers module
+async function gameTabClosed(tabId: number) {
+  console.log(`Game tab "${tabId}" closed`);
+  const gameTab = gameTabs.get(tabId);
+  const gameId = gameTab.gameId;
+  const jamEntry = queue.get(gameId);
+  const url = `https://itch.io${jamEntry.data.url}`;
+  console.log("gameTab", gameTab);
+
+  // await settings.set("container", {
+  //   id: 1,
+  //   name: "Personal",
+  //   iconUrl: "resource://usercontext-content/fingerprint.svg",
+  //   colorCode: "#37adff",
+  // });
+  const success = await openContainerTab(url, settings, notification);
+  await gameTabs.remove(tabId);
+  if (success) {
+    await queue.remove(gameId);
+  }
+}
 
 browser.runtime.onMessage.addListener(async (message, sender) => {
   await Promise.all(promises);
@@ -221,6 +260,20 @@ browser.runtime.onMessage.addListener(async (message, sender) => {
   }
   if (message.type === "clearQueue") {
     await queue.clear();
+  }
+  if (message.type === "notificationResponse") {
+    console.log("notification", notification, message.data);
+    await notification._resolve(message.data);
+    await browser.tabs.remove(sender.tab.id);
+  }
+  if (message.type === "getSettings") {
+    return settings.get(message.key);
+  }
+  if (message.type === "getAllSettings") {
+    return settings.getAll();
+  }
+  if (message.type === "setSettings") {
+    return await settings.set(message.key, message.value);
   }
 });
 

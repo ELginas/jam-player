@@ -1,6 +1,8 @@
 import path from "path";
 import fs from "fs/promises";
 
+export const port = Number(process.env.PORT || "") || 5174;
+
 export const isDev = process.env.NODE_ENV !== "production";
 export const isFirefox = process.env.PLATFORM === "firefox";
 export const isChrome = process.env.PLATFORM === "chrome";
@@ -26,7 +28,7 @@ function generateManifest() {
       type: "module",
     },
     action: {
-      default_popup: "index.html",
+      default_popup: "popup.html",
     },
     content_scripts: [
       {
@@ -51,6 +53,14 @@ function generateManifest() {
 
   if (isFirefox) {
     manifest.background.scripts = ["background.js"];
+    manifest.permissions.push(
+      "cookies",
+      "contextualIdentities",
+      "notifications"
+    );
+    manifest.options_ui = {
+      page: "options.html",
+    };
   } else {
     manifest.background.service_worker = "background.js";
   }

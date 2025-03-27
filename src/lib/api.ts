@@ -1,4 +1,6 @@
 import browser from "webextension-polyfill";
+import { getSessionStorageItem } from "./storage";
+import { isFirefox } from "./utils";
 
 export async function launchGame() {
   return await browser.runtime.sendMessage({
@@ -79,4 +81,44 @@ export async function clearQueue() {
   return await browser.runtime.sendMessage({
     type: "clearQueue",
   });
+}
+
+export async function getSettings(key: string) {
+  return await browser.runtime.sendMessage({
+    type: "getSettings",
+    key,
+  });
+}
+
+export async function getAllSettings() {
+  return await browser.runtime.sendMessage({
+    type: "getAllSettings",
+  });
+}
+
+export async function setSettings(key: string, value) {
+  return await browser.runtime.sendMessage({
+    type: "setSettings",
+    key,
+    value,
+  });
+}
+
+export async function getNotification() {
+  return await getSessionStorageItem("notification", {});
+}
+
+export async function openSettings() {
+  return await browser.tabs.create({ url: "options.html" });
+}
+
+export async function getContainers() {
+  if (!isFirefox()) {
+    return [];
+  }
+  const containers = await browser.contextualIdentities.query({});
+  return [...containers].map((c, i) => ({
+    id: i,
+    ...c,
+  }));
 }
