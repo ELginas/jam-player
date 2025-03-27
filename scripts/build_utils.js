@@ -11,7 +11,7 @@ function generateManifest() {
   const manifest = {
     manifest_version: 3,
     name: "Jam Player",
-    version: "0.1.2",
+    version: "0.2.0",
     author: "ELginas",
     homepage_url: "https://github.com/ELginas/jam-player",
     description: "Playtest game jam games faster and easier.",
@@ -53,11 +53,7 @@ function generateManifest() {
 
   if (isFirefox) {
     manifest.background.scripts = ["background.js"];
-    manifest.permissions.push(
-      "cookies",
-      "contextualIdentities",
-      "notifications"
-    );
+    manifest.permissions.push("cookies", "contextualIdentities");
     manifest.options_ui = {
       page: "options.html",
     };

@@ -8,6 +8,7 @@ import subprocess
 
 project_dir = Path(__file__).parent.parent
 artifacts_dir = project_dir / 'web-ext-artifacts'
+dist_dir = project_dir / 'dist'
 
 
 def get_file_version(filename):
@@ -30,7 +31,9 @@ def move_output(suffix):
             shutil.move(full_path, new_path)
 
 
+shutil.rmtree(dist_dir, ignore_errors=True)
 subprocess.run(['pnpm', 'package:firefox'], check=True)
 move_output('firefox')
+shutil.rmtree(dist_dir, ignore_errors=True)
 subprocess.run(['pnpm', 'package:chrome'], check=True)
 move_output('chrome')

@@ -1,6 +1,6 @@
 {
   "name": "jam-player",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "type": "module",
   "scripts": {
     "dev:js": "NODE_ENV=development vite build --watch",

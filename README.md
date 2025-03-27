@@ -2,7 +2,6 @@
   <img src="https://github.com/user-attachments/assets/8ee1abdc-0714-4dcf-af4b-ddef7e15022d" />
 </p>
 
-
 https://github.com/user-attachments/assets/12549cc0-555c-4e47-b564-97d1f8ef4e8d
 
 **Jam Player** is a Firefox & Chrome extension which speeds up game jam playtesting. Add game jam games into a queue and play then in sequence without jumping through many links manually.
@@ -13,6 +12,7 @@ Features:
 - Opens rating page automatically when game is closed
 - Play next game in queue button in rating page
 - Saving queue between browser restarts and reboots
+- Firefox container support
 
 # Installation
 
