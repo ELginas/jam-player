@@ -20,7 +20,7 @@ Features:
 
 ### Method 1
 
-1. Download a bit out of date version from [addons.firefox.org](https://addons.mozilla.org/en-US/firefox/addon/jam-player/)
+1. Download latest version from [addons.firefox.org](https://addons.mozilla.org/en-US/firefox/addon/jam-player/)
 
 ### Method 2
 
