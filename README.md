@@ -40,6 +40,10 @@ https://github.com/user-attachments/assets/92939532-2349-4540-9877-0d6cb37edb35
 
 https://github.com/user-attachments/assets/e8937110-f9b6-4c2f-aa64-f9b426cab88b
 
+# Gotchas
+
+- If the game tab is the only tab open in the browser, when transitioning to rating page for a brief moment game tab is closed and rating page is not yet opened so there are no tabs opened and browser might close.
+
 # Building
 
 Development setup:
